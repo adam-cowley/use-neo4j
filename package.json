@@ -1,0 +1,19 @@
+{
+  "name": "use-neo4j",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["neo4j", "cypher", "graph-database", "react"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^16.9.50",
+    "react": "^16.13.1",
+    "typescript": "^4.0.3"
+  }
+}
