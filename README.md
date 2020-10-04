@@ -10,16 +10,9 @@ npm i --save use-neo4j
 
 ## Usage
 
-First import the `Neo4jProvider` function:
-
-```ts
-import { Neo4jProvider } from './neo4j'
-```
-
 ### Creating a Driver instance
 
 If you want to hard code the Driver credentials into your app, you can use the `createDriver` helper function to create a new Driver instance and pass it to the `Neo4jProvider`.  This will cause the child components to be rendered immediately.
-
 
 ```tsx
 import { Neo4jProvider, createDriver } from 'use-neo4j'
@@ -41,6 +34,8 @@ ReactDOM.render(
 If you do not pass a driver instance to the `Neo4jProvider`, a login form will be displayed.  You can pass default values through to the form using props:
 
 ```tsx
+import { Neo4jProvider } from 'use-neo4j'
+
 ReactDOM.render(
   <React.StrictMode>
     <Neo4jProvider scheme="neo4j+s" host="myauradb.neo4j.io" port="7687" username="username" password="defaultpassword" database="mydb">
