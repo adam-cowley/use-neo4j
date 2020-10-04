@@ -52,7 +52,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <FormInput classNames={classNames} id="password" label="Password" value={password} setter={setPassword} />
             { showDatabase && <FormInput classNames={classNames} id="database" label="Database" value={database} setter={setDatabase} />}
 
-            <div>
+            <div className={classNames.formButtons}>
                 <FormButton text="Connect to Neo4j" className={classNames.formButtonPrimary} onClick={handleSubmit} />
             </div>
         </div>
