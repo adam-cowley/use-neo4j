@@ -9,8 +9,6 @@ const schemeMap = schemes.map(scheme => ({
     value: scheme,
 }))
 
-console.log(schemeMap);
-
 
 interface LoginFormProps {
     classNames: Record<string, any>;
