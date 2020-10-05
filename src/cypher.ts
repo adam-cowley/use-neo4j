@@ -2,15 +2,19 @@ import { useContext, useEffect, useState } from 'react'
 import neo4j, { Record as Neo4jRecord, QueryResult } from "neo4j-driver"
 import { Neo4jContext } from './neo4j.context'
 
-export interface Neo4jResultState {
-    cypher: string;
-    params?: Record<string, any>;
-    database?: string;
+
+interface Neo4jQueryState {
     loading: boolean;
     error?: Error;
     result?: QueryResult;
     records?: Neo4jRecord[],
     first?: Neo4jRecord,
+}
+
+export interface Neo4jResultState extends Neo4jQueryState {
+    cypher: string;
+    params?: Record<string, any>;
+    database?: string;
 }
 
 export const useCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) : Neo4jResultState => {
@@ -20,20 +24,14 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
 
     const session = driver.session({ database, defaultAccessMode })
 
-    const [ queryState, setQueryState ] = useState<Neo4jResultState>({
+    const [ queryState, setQueryState ] = useState<Neo4jQueryState>({
         loading: true,
-        cypher,
-        params,
-        database,
     })
 
     useEffect(() => {
         session.run(cypher, params)
             .then((result: QueryResult) => {
                 setQueryState({
-                    cypher,
-                    params,
-                    database,
                     loading: false,
                     result,
                     records: result.records,
@@ -42,18 +40,20 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
             })
             .catch((error: Error) => {
                 setQueryState({
-                    cypher,
-                    params,
-                    database,
                     loading: false,
                     error,
                 })
             })
         // eslint-disable-next-line
-    }, [ cypher, params, database ])
+    }, [])
 
 
-    return queryState
+    return {
+        cypher,
+        params,
+        database,
+        ...queryState
+    }
 }
 
 export const useReadCypher = (cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState => useCypher(neo4j.session.READ, cypher, params, database)

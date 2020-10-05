@@ -9,7 +9,6 @@ const schemeMap = schemes.map(scheme => ({
     value: scheme,
 }))
 
-
 interface LoginFormProps {
     classNames: Record<string, any>;
     scheme: Neo4jScheme;
@@ -50,7 +49,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </div>
             <FormInput classNames={classNames} id="username" label="Username" value={username} setter={setUsername} />
             <FormInput classNames={classNames} id="password" label="Password" value={password} setter={setPassword} />
-            { showDatabase && <FormInput classNames={classNames} id="database" label="Database" value={database} setter={setDatabase} />}
+            { (showDatabase === undefined || !!showDatabase) && <FormInput classNames={classNames} id="database" label="Database" value={database} setter={setDatabase} />}
 
             <div className={classNames.formButtons}>
                 <FormButton text="Connect to Neo4j" className={classNames.formButtonPrimary} onClick={handleSubmit} />

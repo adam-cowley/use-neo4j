@@ -4,8 +4,6 @@
 <img src="img/neo4j.png" height="100">
 <img src="img/arrow.svg" height="100">
 <img src="img/react.png" height="100">
-
-
 </div>
 
 
@@ -103,7 +101,7 @@ function MyComponent() {
 #### useWriteCypher
 
 ```ts
-useReadCypher(cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState
+useWriteCypher(cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState
 ```
 
 
