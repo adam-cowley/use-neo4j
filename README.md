@@ -8,7 +8,7 @@
 
 A set of components and hooks for building React applications that communicate to Neo4j.  
 
-A basic example of this library has been configured in the (Graph App Starter Kit for React)[https://github.com/adam-cowley/graphapp-starter-react] template repository.
+A basic example of this library has been configured in the [Graph App Starter Kit for React](https://github.com/adam-cowley/graphapp-starter-react) template repository.
 
 
 ## Installation
