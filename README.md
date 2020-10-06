@@ -1,10 +1,14 @@
 <div style="text-align:center">
 <h1>React Hooks For Neo4j</h1>
 
-<img src="img/neo4j.png" height="100">
-<img src="img/arrow.svg" height="100">
 <img src="img/react.png" height="100">
+<img src="img/arrow.svg" height="100">
+<img src="img/neo4j.png" height="100">
 </div>
+
+A set of components and hooks for building React applications that communicate to Neo4j.  
+
+A basic example of this library has been configured in the (Graph App Starter Kit for React)[https://github.com/adam-cowley/graphapp-starter-react] template repository.
 
 
 ## Installation
