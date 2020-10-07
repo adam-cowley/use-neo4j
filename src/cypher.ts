@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
-import neo4j, { Record as Neo4jRecord, QueryResult } from "neo4j-driver"
+import neo4j, { Record as Neo4jRecord, QueryResult, Result } from "neo4j-driver"
 import { Neo4jContext } from './neo4j.context'
-
 
 interface Neo4jQueryState {
     loading: boolean;
@@ -17,19 +16,36 @@ export interface Neo4jResultState extends Neo4jQueryState {
     database?: string;
 }
 
+const runCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string): Promise<QueryResult> => {
+    const { driver } = useContext(Neo4jContext)
+
+    const session = driver!.session({ database, defaultAccessMode })
+
+    return session.run(cypher, params)
+        .then(res => {
+            session.close()
+
+            return res
+        })
+}
+
+export const read = (cypher: string, params?: Record<string, any>, database?: string) => runCypher(neo4j.session.READ, cypher, params, database)
+
+export const write = (cypher: string, params?: Record<string, any>, database?: string) => runCypher(neo4j.session.WRITE, cypher, params, database)
+
 export const useCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) : Neo4jResultState => {
     const { driver } = useContext(Neo4jContext)
 
     if ( !driver ) throw new Error('`driver` not defined. Have you added it into your app as <Neo4jContext.Provider value={{driver}}> ?')
 
-    const session = driver.session({ database, defaultAccessMode })
+    // const session = driver.session({ database, defaultAccessMode })
 
     const [ queryState, setQueryState ] = useState<Neo4jQueryState>({
         loading: true,
     })
 
     useEffect(() => {
-        session.run(cypher, params)
+        runCypher(defaultAccessMode, cypher, params, database)
             .then((result: QueryResult) => {
                 setQueryState({
                     loading: false,
@@ -44,8 +60,7 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
                     error,
                 })
             })
-        // eslint-disable-next-line
-    }, [])
+    }, [cypher, params, database])
 
 
     return {
