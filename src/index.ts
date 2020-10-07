@@ -1,6 +1,6 @@
 export { Neo4jContext } from './neo4j.context'
 export { Neo4jProvider } from './neo4j.provider'
 export { useTransaction, useReadTransaction, useWriteTransaction } from './transactions'
-export { useCypher, useReadCypher, useWriteCypher, read, write } from './cypher'
+export { useCypher, useReadCypher, useWriteCypher, useLazyWrite } from './cypher'
 export { createDriver } from './driver'
 export { int } from 'neo4j-driver'
