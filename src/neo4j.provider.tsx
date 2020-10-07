@@ -4,7 +4,7 @@ import { Login } from './components/login'
 
 import { Neo4jContext } from './neo4j.context'
 import { createDriver } from './driver'
-import {  Neo4jConfig, Neo4jScheme } from './neo4j-config.interface'
+import { Neo4jConfig, Neo4jScheme } from './neo4j-config.interface'
 
 interface Neo4jProviderProps {
     children: React.ReactNode | React.ReactNode[] | null;

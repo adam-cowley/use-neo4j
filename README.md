@@ -6,7 +6,7 @@
 <img src="img/neo4j.png" height="100">
 </div>
 
-A set of components and hooks for building React applications that communicate to Neo4j.  
+A set of components and hooks for building React applications that communicate to Neo4j.
 
 A basic example of this library has been configured in the [Graph App Starter Kit for React](https://github.com/adam-cowley/graphapp-starter-react) template repository.
 
@@ -70,8 +70,9 @@ export interface Neo4jResultState {
     loading: boolean;
     error?: Error;
     result?: QueryResult;
-    records?: Neo4jRecord[],
-    first?: Neo4jRecord,
+    records?: Neo4jRecord[];
+    first?: Neo4jRecord;
+    run: (params?: Record<string, any>, anotherDatabase?: string) => Promise<void | QueryResult>;
 }
 ```
 
@@ -107,6 +108,46 @@ function MyComponent() {
 ```ts
 useWriteCypher(cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState
 ```
+
+#### Re-running a Query
+
+The `run` function allows you to re-run a query if a prop changes.  This should be wrapped in a `useEffect` function.
+
+```tsx
+const [ query ] = useState('Matrix')
+const { loading, records, run, } = useReadCypher('MATCH (m:Movie) WHERE m.title CONTAINS $query RETURN m LIMIT 12', { query })
+
+// Listen for changes to `query` and re-run cypher if anything changes
+useEffect(() => {
+    run({ query })
+}, [ query ])
+```
+
+### Lazy Queries
+
+If you don't want the query to run straight away (for example an update query), you can use the `useLazyReadCypher` or `useLazyWriteCypher` functions.  The hooks return an array containing the function to run the query and the `Neo4jResultState` as the second parameter:
+
+```tsx
+const [ updateMovie, { loading, first } ] = useLazyWriteCypher(
+  `MATCH (m:Movie) WHERE id(m) = $id SET m += $updates, m.updatedAt = datetime() RETURN m.updatedAt as updatedAt`
+)
+
+const handleSubmit = e => {
+    e.preventDefault()
+
+    updateMovie({ id: int(0), updates: { title, plot } })
+        .then(res => {
+            res && setConfirmation(`Node updated at ${res.records[0].get('updatedAt').toString()}`)
+        })
+        .catch(e => setError(e))
+}
+
+return (
+  <Button primary onClick={handleSubmit}>Update Node</Button>
+)
+```
+
+The run function takes two optional arguments: an object of params and a database if different from the default.
 
 
 ### Transactions

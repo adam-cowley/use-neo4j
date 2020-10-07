@@ -6,93 +6,56 @@ interface Neo4jQueryState {
     loading: boolean;
     error?: Error;
     result?: QueryResult;
-    records?: Neo4jRecord[],
-    first?: Neo4jRecord,
+    records?: Neo4jRecord[];
+    first?: Neo4jRecord;
 }
 
-export interface Neo4jResultState extends Neo4jQueryState {
+export interface LazyResultState extends Neo4jQueryState {
     cypher?: string;
     params?: Record<string, any>;
     database?: string;
 }
 
-const runCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) => {
-    const { driver } = useContext(Neo4jContext)
-
-    if ( !driver ) throw new Error('`driver` not defined in Neo4jContext. Have you added it into your app as <Neo4jProvider driver={{driver}}> ?')
-
-    const session = driver!.session({ database, defaultAccessMode })
-
-    return session.run(cypher, params)
-        .then(res => {
-            session.close()
-
-            return res
-        })
+export interface EagerResultState extends LazyResultState {
+    run: (params?: Record<string, any>, anotherDatabase?: string) => Promise<void | QueryResult>;
 }
 
-export const read = (cypher: string, params?: Record<string, any>, database?: string) => runCypher(neo4j.session.READ, cypher, params, database)
-
-
-
-export const useCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) : Neo4jResultState => {
-    const { driver } = useContext(Neo4jContext)
-
-    if ( !driver ) throw new Error('`driver` not defined. Have you added it into your app as <Neo4jContext.Provider value={{driver}}> ?')
-
-    const session = driver.session({ database, defaultAccessMode })
-
-    const [ queryState, setQueryState ] = useState<Neo4jQueryState>({
-        loading: true,
-    })
+export const useCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) : EagerResultState => {
+    const [ run, queryState ] = useLazyCypher(defaultAccessMode, cypher, database)
 
     useEffect(() => {
-        session.run(cypher, params)
-            .then((result: QueryResult) => {
-                setQueryState({
-                    loading: false,
-                    result,
-                    records: result.records,
-                    first: result.records[0],
-                })
-            })
-            .catch((error: Error) => {
-                setQueryState({
-                    loading: false,
-                    error,
-                })
-            })
-    }, [ cypher, params, database ])
-
+        run(params)
+    }, [])
 
     return {
-        cypher,
-        params,
-        database,
+        run,
         ...queryState
     }
 }
 
-export const useReadCypher = (cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState => useCypher(neo4j.session.READ, cypher, params, database)
+export const useReadCypher = (cypher: string, params?: Record<string, any>, database?: string): EagerResultState => useCypher(neo4j.session.READ, cypher, params, database)
+export const useWriteCypher = (cypher: string, params?: Record<string, any>, database?: string): EagerResultState => useCypher(neo4j.session.WRITE, cypher, params, database)
 
-export const useWriteCypher = (cypher: string, params?: Record<string, any>, database?: string): Neo4jResultState => useCypher(neo4j.session.WRITE, cypher, params, database)
+export const useLazyReadCypher = (cypher: string, database?: string): [ (params?: Record<string, any>) => Promise<void | QueryResult>, LazyResultState ] => useLazyCypher(neo4j.session.READ, cypher, database)
+export const useLazyWriteCypher = (cypher: string, database?: string): [ (params?: Record<string, any>) => Promise<void | QueryResult>, LazyResultState ] => useLazyCypher(neo4j.session.WRITE, cypher, database)
 
-
-export const useLazyWrite = (database?: string): [ (cypher: string, params?) => Record<string, any>, Neo4jResultState ] => {
+const useLazyCypher = (defaultAccessMode: any, cypher: string, database?: string): [ (params?: Record<string, any>, anotherDatabase?: string) => Promise<void | QueryResult>, LazyResultState ] => {
     const { driver } = useContext(Neo4jContext)
     if ( !driver ) throw new Error('`driver` not defined in Neo4jContext. Have you added it into your app as <Neo4jProvider driver={{driver}}> ?')
 
-    const session = driver!.session({ database, defaultAccessMode: neo4j.session.WRITE })
+    const [ queryState, setQueryState ] = useState<LazyResultState>({ loading: false, database, cypher })
 
-    const [ queryState, setQueryState ] = useState<Neo4jResultState>({ loading: false, database, })
+    const run = (params?: Record<string, any>, anotherDatabase?: string): Promise<QueryResult> => {
+        const session = driver!.session({ database, defaultAccessMode })
 
-    const run = (cypher: string, params?: Record<string, any>): Promise<void | QueryResult> => {
+        setQueryState({ loading: true, database: anotherDatabase || database, cypher })
+
         return session.run(cypher, params)
             .then((result: QueryResult) => {
                 setQueryState({
                     cypher,
                     params,
-                    database,
+                    database: anotherDatabase || database,
                     loading: false,
                     result,
                     records: result.records,
@@ -107,12 +70,21 @@ export const useLazyWrite = (database?: string): [ (cypher: string, params?) => 
                 setQueryState({
                     cypher,
                     params,
-                    database,
+                    database: anotherDatabase || database,
                     loading: false,
                     error,
                 })
+
+                throw error
             })
     }
 
-    return [run, queryState]
+    return [
+        run,
+        {
+            cypher,
+            database,
+            ...queryState
+        }
+    ]
 }
