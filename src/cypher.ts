@@ -38,16 +38,16 @@ export const write = (cypher: string, params?: Record<string, any>, database?: s
 export const useCypher = (defaultAccessMode: any, cypher: string, params?: Record<string, any>, database?: string) : Neo4jResultState => {
     const { driver } = useContext(Neo4jContext)
 
-    if ( !driver ) throw new Error('`driver` not defined in Neo4jContext. Have you added it into your app as <Neo4jProvider driver={{driver}}> ?')
+    if ( !driver ) throw new Error('`driver` not defined. Have you added it into your app as <Neo4jContext.Provider value={{driver}}> ?')
 
-    // const session = driver.session({ database, defaultAccessMode })
+    const session = driver.session({ database, defaultAccessMode })
 
     const [ queryState, setQueryState ] = useState<Neo4jQueryState>({
         loading: true,
     })
 
     useEffect(() => {
-        runCypher(defaultAccessMode, cypher, params, database)
+        session.run(cypher, params)
             .then((result: QueryResult) => {
                 setQueryState({
                     loading: false,
@@ -62,7 +62,7 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
                     error,
                 })
             })
-    }, [cypher, params, database])
+    }, [])
 
 
     return {
