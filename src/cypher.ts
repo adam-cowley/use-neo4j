@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
-import neo4j, { Record as Neo4jRecord, QueryResult, Result } from "neo4j-driver"
+import neo4j, { Record as Neo4jRecord, QueryResult, Result, Session } from "neo4j-driver"
 import { Neo4jContext } from './neo4j.context'
 
 interface Neo4jQueryState {
     loading: boolean;
+    session?: Session;
     error?: Error;
     result?: QueryResult;
     records?: Neo4jRecord[];
@@ -24,7 +25,7 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
     const [ run, queryState ] = useLazyCypher(defaultAccessMode, cypher, database)
 
     useEffect(() => {
-        run(params)
+        run(params, database)
     }, [])
 
     return {
@@ -39,8 +40,8 @@ export const useWriteCypher = (cypher: string, params?: Record<string, any>, dat
 export const useLazyReadCypher = (cypher: string, database?: string): [ (params?: Record<string, any>) => Promise<void | QueryResult>, LazyResultState ] => useLazyCypher(neo4j.session.READ, cypher, database)
 export const useLazyWriteCypher = (cypher: string, database?: string): [ (params?: Record<string, any>) => Promise<void | QueryResult>, LazyResultState ] => useLazyCypher(neo4j.session.WRITE, cypher, database)
 
-const useLazyCypher = (defaultAccessMode: any, cypher: string, database?: string): [ (params?: Record<string, any>, anotherDatabase?: string) => Promise<void | QueryResult>, LazyResultState ] => {
-    const { driver } = useContext(Neo4jContext)
+const useLazyCypher = (defaultAccessMode: any, cypher: string, defaultDatabase?: string): [ (params?: Record<string, any>, anotherDatabase?: string) => Promise<void | QueryResult>, LazyResultState ] => {
+    const { driver, database } = useContext(Neo4jContext)
     if ( !driver ) throw new Error('`driver` not defined in Neo4jContext. Have you added it into your app as <Neo4jProvider driver={{driver}}> ?')
 
     const [ queryState, setQueryState ] = useState<LazyResultState>({ loading: false, database, cypher })
@@ -48,14 +49,15 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, database?: string
     const run = (params?: Record<string, any>, anotherDatabase?: string): Promise<QueryResult> => {
         const session = driver!.session({ database, defaultAccessMode })
 
-        setQueryState({ loading: true, database: anotherDatabase || database, cypher })
+        setQueryState({ session, loading: true, database: anotherDatabase || defaultDatabase || database, cypher })
 
         return session.run(cypher, params)
             .then((result: QueryResult) => {
                 setQueryState({
+                    session,
                     cypher,
                     params,
-                    database: anotherDatabase || database,
+                    database: anotherDatabase || defaultDatabase || database,
                     loading: false,
                     result,
                     records: result.records,
@@ -68,6 +70,7 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, database?: string
             })
             .catch((error: Error) => {
                 setQueryState({
+                    session,
                     cypher,
                     params,
                     database: anotherDatabase || database,

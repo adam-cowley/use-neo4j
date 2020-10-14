@@ -14,6 +14,7 @@ interface Neo4jProviderProps {
     port?: string | number;
     username?: string;
     password?: string;
+    database?: string;
 
     title?: React.ReactNode | React.ReactNode[] | null;
     logo?: React.ReactNode | React.ReactNode[] | null;
@@ -25,31 +26,35 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
     const [ authenticating, setAuthenticating ] = useState<boolean>(true)
     const [ config, setConfig ] = useState<Neo4jConfig>({} as Neo4jConfig)
     const [ driver, setDriver ] = useState<Driver | undefined>(props.driver)
+
     const [ error, setError ] = useState<Error>()
-    const [ database, setDatabase ] = useState<string>()
+    const [ database, setDatabase ] = useState<string | undefined>(props.database)
 
     const attemptLogin = (config: Neo4jConfig) => {
         setConfig(config)
         setDatabase(database)
 
-        const driver = createDriver(config.scheme, config.host, config.port, config.username, config.password)
+        const newDriver = createDriver(config.scheme, config.host, config.port, config.username, config.password)
 
-        driver.verifyConnectivity()
-            .then(() => setDriver(driver))
+        newDriver.verifyConnectivity()
+            .then(() => setDriver(newDriver))
             .catch(e => setError(e))
     }
 
     // Test driver passed as a prop
     useEffect(() => {
-        if ( driver ) {
-            driver.verifyConnectivity()
+        if ( props.driver ) {
+            props.driver.verifyConnectivity()
                 .catch(e => setError(e))
-                .finally(() => setAuthenticating(false))
+                .finally(() => {
+                    setDriver(props.driver)
+                    setAuthenticating(false)
+                })
         }
         else {
             setAuthenticating(false)
         }
-    }, [])
+    }, [driver])
 
     // Wait for effect to verify driver connectivity
     if ( authenticating ) {
@@ -60,6 +65,7 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
         const { title, logo, details, footer } = props;
 
         return (<Login
+            error={error}
             title={title}
             logo={logo}
             details={details}

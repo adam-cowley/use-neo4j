@@ -25,7 +25,6 @@ interface LoginProps {
     footer?: React.ReactNode | React.ReactNode[] | null;
 }
 
-
 export const Login: React.FC<LoginProps> = ({ error, onSubmit, ...props }) => {
     // @ts-ignore
     const [showProjectForm, setShowProjectForm] = useState((props.showProject || props.showProject === undefined) && window.neo4jDesktopApi)
