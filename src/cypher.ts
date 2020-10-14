@@ -46,7 +46,7 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, defaultDatabase?:
 
     const [ queryState, setQueryState ] = useState<LazyResultState>({ loading: false, database, cypher })
 
-    const run = (params?: Record<string, any>, anotherDatabase?: string): Promise<QueryResult> => {
+    const run = (params?: Record<string, any>, anotherDatabase?: string): Promise<void | QueryResult> => {
         const session = driver!.session({ database, defaultAccessMode })
 
         setQueryState({ session, loading: true, database: anotherDatabase || defaultDatabase || database, cypher })
@@ -78,7 +78,7 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, defaultDatabase?:
                     error,
                 })
 
-                throw error
+                session.close()
             })
     }
 
