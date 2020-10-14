@@ -48,7 +48,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 <FormInput classNames={classNames} id="port" label="Port" value={port} setter={setPort} />
             </div>
             <FormInput classNames={classNames} id="username" label="Username" value={username} setter={setUsername} />
-            <FormInput classNames={classNames} id="password" label="Password" value={password} setter={setPassword} />
+            <FormInput classNames={classNames} id="password" label="Password" value={password} setter={setPassword} type="password"/>
             { (showDatabase === undefined || !!showDatabase) && <FormInput classNames={classNames} id="database" label="Database" value={database} setter={setDatabase} />}
 
             <div className={classNames.formButtons}>
