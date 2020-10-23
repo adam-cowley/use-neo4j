@@ -1,6 +1,6 @@
 {
   "name": "use-neo4j",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
