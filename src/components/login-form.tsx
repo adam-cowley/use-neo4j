@@ -17,6 +17,7 @@ interface LoginFormProps {
     username: string;
     password: string;
     database: string;
+    showHost: boolean;
     showDatabase: boolean;
     onSubmit: Function;
 }
@@ -24,6 +25,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
     classNames,
     onSubmit,
+    showHost,
     showDatabase,
     ...props
 }) => {
@@ -42,11 +44,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
     return (
         <div>
-            <div className={classNames.loginServerGroup}>
+            {showHost && <div className={classNames.loginServerGroup}>
                 <FormSelect classNames={classNames} id="scheme" label="Scheme" options={schemeMap} value={scheme} setter={handleSchemeChange} />
                 <FormInput classNames={classNames} id="host" label="Host" value={host} setter={setHost} />
                 <FormInput classNames={classNames} id="port" label="Port" value={port} setter={setPort} />
-            </div>
+            </div>}
             <FormInput classNames={classNames} id="username" label="Username" value={username} setter={setUsername} />
             <FormInput classNames={classNames} id="password" label="Password" value={password} setter={setPassword} type="password"/>
             { (showDatabase === undefined || !!showDatabase) && <FormInput classNames={classNames} id="database" label="Database" value={database} setter={setDatabase} />}

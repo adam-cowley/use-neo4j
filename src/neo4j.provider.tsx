@@ -16,6 +16,10 @@ interface Neo4jProviderProps {
     password?: string;
     database?: string;
 
+    showHost?: boolean;
+    showDatabase?: boolean;
+    showActive?: boolean;
+
     title?: React.ReactNode | React.ReactNode[] | null;
     logo?: React.ReactNode | React.ReactNode[] | null;
     details?: React.ReactNode | React.ReactNode[] | null;
@@ -70,6 +74,9 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
             logo={logo}
             details={details}
             footer={footer}
+            showActive={props.showActive}
+            showHost={props.showHost}
+            showDatabase={props.showDatabase}
             onSubmit={attemptLogin}
             {...props}
         />)

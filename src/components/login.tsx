@@ -15,6 +15,7 @@ interface LoginProps {
     password?: string;
     database?: string;
 
+    showHost?: boolean;
     showActive?: boolean;
     showProject?: boolean;
     showDatabase?: boolean;
@@ -39,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ error, onSubmit, ...props }) => {
     }
     else {
         // @ts-ignore
-        form = <LoginForm classNames={classNames} onSubmit={onSubmit} {...props} />
+        form = <LoginForm classNames={classNames} showHost={props.showHost || true} onSubmit={onSubmit} {...props} />
     }
 
     return (

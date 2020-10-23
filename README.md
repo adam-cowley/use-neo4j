@@ -56,6 +56,22 @@ ReactDOM.render(
 );
 ```
 
+#### Hide Database
+
+You can hide the database field from the form by passing `showDatabase` prop with a value of `false`
+
+```tsx
+<Neo4jProvider showDatabase={false}>
+```
+
+#### Hide Host
+
+You can force the user to connect to a specific database by providing the connection details to the `Neo4jProvider` and set the `showHost` prop to false.
+
+```tsx
+<Neo4jProvider scheme="neo4j" host="localhost" port="7687" showHost={false}>
+```
+
 ## Hooks
 
 ### Cypher
