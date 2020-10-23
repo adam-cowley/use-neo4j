@@ -44,7 +44,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
     return (
         <div>
-            {(showHost || true) && <div className={classNames.loginServerGroup}>
+            {(showHost === undefined || !!showHost) && <div className={classNames.loginServerGroup}>
                 <FormSelect classNames={classNames} id="scheme" label="Scheme" options={schemeMap} value={scheme} setter={handleSchemeChange} />
                 <FormInput classNames={classNames} id="host" label="Host" value={host} setter={setHost} />
                 <FormInput classNames={classNames} id="port" label="Port" value={port} setter={setPort} />
