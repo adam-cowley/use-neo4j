@@ -36,11 +36,11 @@ export const Login: React.FC<LoginProps> = ({ error, onSubmit, ...props }) => {
     let form
 
     if ( showProjectForm ) {
-        form = <LoginDesktop classNames={classNames} showActive={props.showActive || true} hide={() => setShowProjectForm(false)} onSubmit={onSubmit} />
+        form = <LoginDesktop classNames={classNames} showActive={props.showActive} hide={() => setShowProjectForm(false)} onSubmit={onSubmit} />
     }
     else {
         // @ts-ignore
-        form = <LoginForm classNames={classNames} showHost={props.showHost || true} onSubmit={onSubmit} {...props} />
+        form = <LoginForm classNames={classNames} showHost={props.showHost} showDatabase={props.showDatabase} onSubmit={onSubmit} {...props} />
     }
 
     return (
