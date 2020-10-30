@@ -207,3 +207,26 @@ fetchSomeData()
     .catch(e => rollback())
 ```
 
+
+## Schema Hooks
+
+### useSchema ()
+
+**Note:** Requires [APOC](https://neo4j.com/labs/apoc/)
+
+The `useSchema` hook calls the [`apoc.meta.schema` procedure](https://neo4j.com/labs/apoc/4.1/database-introspection/meta/) and returns arrays of labels and relationship types.
+
+Usage:
+```
+const { loading, labels, types } = useSchema()
+```
+
+Output:
+
+```
+export interface UseSchemaOutput {
+    loading: boolean;
+    labels: LabelSchema[];
+    types: RelationshipTypeSchema[];
+}
+```
