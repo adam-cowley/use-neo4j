@@ -26,6 +26,7 @@ export interface UseSchemaOutput {
     loading: boolean;
     labels: LabelSchema[];
     types: RelationshipTypeSchema[];
+    database?: string;
 }
 
 function toPropertySchema(properties: Record<string, Record<string, any>>): Record<string, PropertySchema> {
@@ -58,8 +59,8 @@ function toRelationshipTypeSchema(type: string, input: Record<string, any>): Rel
     } as RelationshipTypeSchema
 }
 
-export function useSchema(database?: string): UseSchemaOutput {
-    const { loading, first } = useReadCypher('call apoc.meta.schema', {}, database)
+export function useSchema(specificDatabase?: string): UseSchemaOutput {
+    const { loading, first, database } = useReadCypher('call apoc.meta.schema', {}, specificDatabase)
     const [ labels, setLabels ] = useState<LabelSchema[]>([])
     const [ types, setTypes ] = useState<RelationshipTypeSchema[]>([])
 
@@ -81,6 +82,7 @@ export function useSchema(database?: string): UseSchemaOutput {
 
     return {
         loading,
+        database,
         labels,
         types,
     }
