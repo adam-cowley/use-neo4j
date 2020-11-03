@@ -58,8 +58,8 @@ function toRelationshipTypeSchema(type: string, input: Record<string, any>): Rel
     } as RelationshipTypeSchema
 }
 
-export function useSchema(): UseSchemaOutput {
-    const { loading, first } = useReadCypher('call apoc.meta.schema')
+export function useSchema(database?: string): UseSchemaOutput {
+    const { loading, first } = useReadCypher('call apoc.meta.schema', {}, database)
     const [ labels, setLabels ] = useState<LabelSchema[]>([])
     const [ types, setTypes ] = useState<RelationshipTypeSchema[]>([])
 
