@@ -73,7 +73,7 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, defaultDatabase?:
                     session,
                     cypher,
                     params,
-                    database: anotherDatabase || database,
+                    database: anotherDatabase || defaultDatabase || database,
                     loading: false,
                     error,
                 })
