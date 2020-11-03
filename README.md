@@ -210,23 +210,56 @@ fetchSomeData()
 
 ## Schema Hooks
 
-### useSchema ()
+### useSchema
 
 **Note:** Requires [APOC](https://neo4j.com/labs/apoc/)
 
 The `useSchema` hook calls the [`apoc.meta.schema` procedure](https://neo4j.com/labs/apoc/4.1/database-introspection/meta/) and returns arrays of labels and relationship types.
 
 Usage:
-```
-const { loading, labels, types } = useSchema()
+```ts
+const { loading, labels, types } = useSchema(database)
 ```
 
 Output:
 
-```
+```ts
 export interface UseSchemaOutput {
     loading: boolean;
     labels: LabelSchema[];
     types: RelationshipTypeSchema[];
+}
+```
+
+### useDatabases
+
+The `useDatabases` hook returns a list of databases for the current connection (version 4.0 and above).  The hook runs the `SHOW DATABASES` query against the system database and returns a list of databases.
+
+
+```ts
+const { loading, error, databases } = useDatabases()
+```
+
+Output:
+
+```ts
+interface UseDatabasesOutput {
+    loading: boolean;
+    error?: Error;
+    databases: Database[] | undefined
+}
+```
+
+A `Database` object consists of:
+
+```ts
+interface Database {
+    name: string;
+    address: string;
+    role: DatabaseRole;
+    requestedStatus: DatabaseStatus;
+    currentStatus: DatabaseStatus;
+    error: string;
+    default: boolean;
 }
 ```

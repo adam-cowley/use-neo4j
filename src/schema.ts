@@ -89,3 +89,42 @@ export function useSchema(specificDatabase?: string): UseSchemaOutput {
         types,
     }
 }
+
+type DatabaseRole = 'leader' | 'follower' | 'read_replica' | 'standalone'
+type DatabaseStatus = 'online' | 'offline' | 'initial'
+
+interface Database {
+    name: string;
+    address: string;
+    role: DatabaseRole;
+    requestedStatus: DatabaseStatus;
+    currentStatus: DatabaseStatus;
+    error: string;
+    default: boolean;
+}
+
+interface UseDatabasesOutput {
+    loading: boolean;
+    error?: Error;
+    databases: Database[] | undefined
+}
+
+export function useDatabases(): UseDatabasesOutput {
+    const { loading, error, records } = useReadCypher('SHOW DATABASES', {}, 'system')
+
+    const databases = records?.map(row => ({
+        name: row.get('name'),
+        address: row.get('address'),
+        role: row.get('role'),
+        requestedStatus: row.get('requestedStatus'),
+        currentStatus: row.get('currentStatus'),
+        error: row.get('error'),
+        default: row.get('default'),
+    }))
+
+    return {
+        loading,
+        error,
+        databases,
+    }
+}
