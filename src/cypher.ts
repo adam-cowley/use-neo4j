@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import neo4j, { Record as Neo4jRecord, QueryResult, Result, Session } from "neo4j-driver"
+import neo4j, { Record as Neo4jRecord, QueryResult, Result, Session, Driver } from "neo4j-driver"
 import { Neo4jContext } from './neo4j.context'
 
 interface Neo4jQueryState {
@@ -34,6 +34,14 @@ export const useCypher = (defaultAccessMode: any, cypher: string, params?: Recor
     }
 }
 
+const createSession = (driver: Driver, database: string | undefined, defaultAccessMode: any): Session => {
+    if ( database !== undefined && database !== '' ) {
+        return driver!.session({ database, defaultAccessMode })
+    }
+
+    return driver!.session({ defaultAccessMode })
+}
+
 export const useReadCypher = (cypher: string, params?: Record<string, any>, database?: string): EagerResultState => useCypher(neo4j.session.READ, cypher, params, database)
 export const useWriteCypher = (cypher: string, params?: Record<string, any>, database?: string): EagerResultState => useCypher(neo4j.session.WRITE, cypher, params, database)
 
@@ -47,7 +55,7 @@ const useLazyCypher = (defaultAccessMode: any, cypher: string, defaultDatabase?:
     const [ queryState, setQueryState ] = useState<LazyResultState>({ loading: false, database, cypher })
 
     const run = (params?: Record<string, any>, anotherDatabase?: string): Promise<void | QueryResult> => {
-        const session = driver!.session({ database: anotherDatabase || defaultDatabase || database, defaultAccessMode })
+        const session = createSession(driver, anotherDatabase || defaultDatabase || database, defaultAccessMode)
 
         setQueryState({ session, loading: true, database: anotherDatabase || defaultDatabase || database, cypher })
 

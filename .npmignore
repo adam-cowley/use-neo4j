@@ -3,3 +3,4 @@ src
 tsconfig.json
 img/
 coverage
+*.config.js

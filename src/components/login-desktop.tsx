@@ -60,9 +60,15 @@ export const LoginDesktop: React.FC<LoginDesktopProps> = ({ classNames, showActi
     }
 
     const handleSubmit = () => {
-        // @ts-ignore
-        const { host, port, username, password } = graph.connection.configuration.protocols.bolt
-        const scheme = 'neo4j'
+        if ( !graph ) return;
+
+        const { url, host, port, username, password } = (graph! as Record<string, any>).connection.configuration.protocols.bolt
+
+        let scheme = 'neo4j'
+
+        if ( url.includes('://') ) {
+            scheme = url.split('://')[0]
+        }
 
         onSubmit({ scheme, host, port, username, password } as Neo4jConfig)
     }
