@@ -21,8 +21,6 @@ export function useRoles(): UseRolesOutput {
 
             const index = acc.findIndex(role => role.role === name)
 
-            console.log(acc, index);
-
             if ( index > -1 ) {
                 (acc[ index ] as Role).members.push(member)
                 return acc
