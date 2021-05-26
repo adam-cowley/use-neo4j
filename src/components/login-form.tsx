@@ -29,7 +29,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     showDatabase,
     ...props
 }) => {
-    const [scheme, setScheme] = useState<Neo4jScheme>('neo4j')
+    const [scheme, setScheme] = useState<Neo4jScheme>(props.scheme || 'neo4j')
     const [host, setHost] = useState(props.host || 'localhost')
     const [port, setPort] = useState(props.port || 7687)
     const [username, setUsername] = useState(props.username || 'neo4j')
