@@ -1,4 +1,4 @@
-import { useReadCypher } from "use-neo4j";
+import { useReadCypher } from "./cypher"
 
 interface Role {
     role: string;
