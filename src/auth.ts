@@ -5,7 +5,6 @@ interface Role {
     members: string[];
 }
 
-
 interface UseRolesOutput {
     loading: boolean;
     error?: Error;
