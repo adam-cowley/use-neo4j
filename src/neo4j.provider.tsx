@@ -34,7 +34,7 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
     const [ error, setError ] = useState<Error>()
     const [ database, setDatabase ] = useState<string | undefined>(props.database)
 
-    const attemptLogin = (config: Neo4jConfig) => {
+    const updateConnection = (config: Neo4jConfig) => {
         setConfig(config)
         setDatabase(database)
 
@@ -77,13 +77,13 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
             showActive={props.showActive}
             showHost={props.showHost}
             showDatabase={props.showDatabase}
-            onSubmit={attemptLogin}
+            onSubmit={updateConnection}
             {...props}
         />)
     }
 
     return (
-        <Neo4jContext.Provider value={{ driver, config, database }}>
+        <Neo4jContext.Provider value={{ driver, config, database, updateConnection, setDatabase, }}>
             {props.children}
         </Neo4jContext.Provider>
     )
