@@ -263,3 +263,15 @@ interface Database {
     default: boolean;
 }
 ```
+
+## Connection Hooks
+
+### useConnection
+
+The `useConnection` hook allows you to update the connection details for the driver held in `Neo4jContext`
+
+```ts
+useConnection(scheme: Neo4jScheme, host: string, port: string | number, username: string, password: string)
+```
+
+This hook will update the driver instance within the context and attempt to verify connectivity.
