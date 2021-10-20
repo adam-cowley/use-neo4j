@@ -10,4 +10,3 @@ export const createDriver = (scheme: Neo4jScheme, host: string, port: string | n
     return neo4j.driver(`${scheme}://${host}:${port}`, neo4j.auth.basic(username, password), config)
 }
 
-export const updateConnection(scheme: Neo4jScheme, host: string, port: string | number, username?: string, password?: string, config?: Config)
