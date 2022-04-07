@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { auth, Driver } from 'neo4j-driver'
+import { auth, Driver, AuthToken } from 'neo4j-driver'
 import { Login } from './components/login'
+import neo4j from 'neo4j-driver'
 
 import { Neo4jContext } from './neo4j.context'
 import { createDriver } from './driver'
-import { Neo4jConfig, Neo4jScheme } from './neo4j-config.interface'
+import { LOCAL_STORAGE_KEY, Neo4jConfig, Neo4jScheme } from './neo4j-config.interface'
 
 interface Neo4jProviderProps {
     children: React.ReactNode | React.ReactNode[] | null;
@@ -27,12 +28,15 @@ interface Neo4jProviderProps {
 }
 
 export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProviderProps) => {
+    const configFromStorage: Neo4jConfig = (window.localStorage ? window.localStorage.getItem(LOCAL_STORAGE_KEY) || '{}' : {}) as Neo4jConfig
+
     const [ authenticating, setAuthenticating ] = useState<boolean>(true)
-    const [ config, setConfig ] = useState<Neo4jConfig>({} as Neo4jConfig)
+    const [ config, setConfig ] = useState<Neo4jConfig>(configFromStorage)
     const [ driver, setDriver ] = useState<Driver | undefined>(props.driver)
 
     const [ error, setError ] = useState<Error>()
     const [ database, setDatabase ] = useState<string | undefined>(props.database)
+
 
     const updateConnection = (config: Neo4jConfig) => {
         setConfig(config)
@@ -47,6 +51,24 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
 
     // Test driver passed as a prop
     useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search)
+
+        // Attempt to connect from URL parameters
+        let urlScheme, urlHost, urlPort
+
+        if ( searchParams.has('url') ) {
+            const url = searchParams.get('url')!
+
+            const matches = url.match(/((neo4j|neo4j\+s|neo4j\+ssc|bolt|bolt\+s|bolt\+ssc):\/\/)([a-z0-9\.]+)(:([0-9]+))/)
+
+            if (matches) {
+                urlScheme = matches[2]
+                urlHost = matches[3]
+                urlPort = matches[5]
+            }
+        }
+
+        // Has Driver been Passed?
         if ( props.driver ) {
             props.driver.verifyConnectivity()
                 .catch(e => setError(e))
@@ -55,10 +77,50 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
                     setAuthenticating(false)
                 })
         }
+        // Has a connection string been provided to the url?
+        else if (urlScheme && urlHost && urlPort) {
+            // Build Credentials
+            const url = `${urlScheme}://${urlHost}:${urlPort}`
+            let auth: AuthToken | undefined
+
+            // Auth token?
+            const username = searchParams.get('username') || undefined
+            const password = searchParams.get('password') || undefined
+
+            if ( username && password ) {
+                auth = neo4j.auth.basic(username, password)
+            }
+
+            // Attempt to Connect
+            const driver = neo4j.driver(url, auth)
+
+            driver.verifyConnectivity()
+                .catch(e => setError(e))
+                .finally(() => {
+                    setConfig({
+                        scheme: urlScheme || 'neo4j',
+                        host: urlHost || 'localhost',
+                        port: urlPort || 7687,
+                        username,
+                        password,
+                        database: searchParams.get('database') || undefined
+                    })
+                    setDriver(driver)
+                    setAuthenticating(false)
+                })
+        }
         else {
             setAuthenticating(false)
         }
     }, [driver])
+
+    // Save Auth to LocalStorage
+    useEffect(() => {
+        if ( window.localStorage && !error ) {
+            window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config))
+        }
+
+    }, [ authenticating ])
 
     // Wait for effect to verify driver connectivity
     if ( authenticating ) {

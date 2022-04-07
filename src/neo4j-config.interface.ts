@@ -4,7 +4,9 @@ export interface Neo4jConfig {
     scheme: Neo4jScheme;
     host: string;
     port: number | string;
-    username: string;
-    password: string;
-    database?: string;
+    username: string | undefined;
+    password: string | undefined;
+    database?: string | undefined;
 }
+
+export const LOCAL_STORAGE_KEY = '$$charts::config'
