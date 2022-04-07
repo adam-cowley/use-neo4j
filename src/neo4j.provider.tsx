@@ -28,7 +28,7 @@ interface Neo4jProviderProps {
 }
 
 export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProviderProps) => {
-    const configFromStorage: Neo4jConfig = (window.localStorage ? window.localStorage.getItem(LOCAL_STORAGE_KEY) || '{}' : {}) as Neo4jConfig
+    const configFromStorage: Neo4jConfig = (window.localStorage ? JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEY) || '{}') : {}) as Neo4jConfig
 
     const [ authenticating, setAuthenticating ] = useState<boolean>(true)
     const [ config, setConfig ] = useState<Neo4jConfig>(configFromStorage)
