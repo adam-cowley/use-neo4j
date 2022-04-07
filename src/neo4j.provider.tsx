@@ -49,7 +49,7 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
             .catch(e => setError(e))
     }
 
-    // Test driver passed as a prop
+    // Test driver passed as a prop or url search params
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search)
 
@@ -92,22 +92,16 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
             }
 
             // Attempt to Connect
-            const driver = neo4j.driver(url, auth)
+            const config: Neo4jConfig = {
+                scheme: urlScheme || 'neo4j',
+                host: urlHost || 'localhost',
+                port: urlPort || 7687,
+                username,
+                password,
+                database: searchParams.get('database') || undefined
+            }
 
-            driver.verifyConnectivity()
-                .catch(e => setError(e))
-                .finally(() => {
-                    setConfig({
-                        scheme: urlScheme || 'neo4j',
-                        host: urlHost || 'localhost',
-                        port: urlPort || 7687,
-                        username,
-                        password,
-                        database: searchParams.get('database') || undefined
-                    })
-                    setDriver(driver)
-                    setAuthenticating(false)
-                })
+            updateConnection(config)
         }
         else {
             setAuthenticating(false)
