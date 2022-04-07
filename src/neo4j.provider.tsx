@@ -41,16 +41,42 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
     const updateConnection = (config: Neo4jConfig) => {
         setConfig(config)
         setDatabase(database)
+        setAuthenticating(true)
 
         const newDriver = createDriver(config.scheme, config.host, config.port, config.username, config.password)
 
         newDriver.verifyConnectivity()
-            .then(() => setDriver(newDriver))
+            .then(() => {
+                setDriver(newDriver)
+
+                window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config))
+            })
             .catch(e => setError(e))
+            .finally(() => setAuthenticating(false))
     }
+
+    useEffect(() => {
+        // Has Driver been Passed?
+        if ( props.driver ) {
+            props.driver.verifyConnectivity()
+                .catch(e => setError(e))
+                .finally(() => {
+                    setDriver(props.driver)
+                    setAuthenticating(false)
+                })
+        }
+        // Has a connection string been provided to the url?
+        else {
+            setAuthenticating(false)
+        }
+    }, [driver])
 
     // Test driver passed as a prop or url search params
     useEffect(() => {
+        if ( props.driver !== undefined)  {
+            return
+        }
+
         const searchParams = new URLSearchParams(window.location.search)
 
         // Attempt to connect from URL parameters
@@ -68,17 +94,7 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
             }
         }
 
-        // Has Driver been Passed?
-        if ( props.driver ) {
-            props.driver.verifyConnectivity()
-                .catch(e => setError(e))
-                .finally(() => {
-                    setDriver(props.driver)
-                    setAuthenticating(false)
-                })
-        }
-        // Has a connection string been provided to the url?
-        else if (urlScheme && urlHost && urlPort) {
+        if (urlScheme && urlHost && urlPort) {
             // Build Credentials
             const url = `${urlScheme}://${urlHost}:${urlPort}`
             let auth: AuthToken | undefined
@@ -103,18 +119,8 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
 
             updateConnection(config)
         }
-        else {
-            setAuthenticating(false)
-        }
-    }, [driver])
+    }, [ props.driver ])
 
-    // Save Auth to LocalStorage
-    useEffect(() => {
-        if ( window.localStorage && !error ) {
-            window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config))
-        }
-
-    }, [ authenticating ])
 
     // Wait for effect to verify driver connectivity
     if ( authenticating ) {
