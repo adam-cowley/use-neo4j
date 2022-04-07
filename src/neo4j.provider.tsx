@@ -96,16 +96,8 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
 
         if (urlScheme && urlHost && urlPort) {
             // Build Credentials
-            const url = `${urlScheme}://${urlHost}:${urlPort}`
-            let auth: AuthToken | undefined
-
-            // Auth token?
-            const username = searchParams.get('username') || undefined
-            const password = searchParams.get('password') || undefined
-
-            if ( username && password ) {
-                auth = neo4j.auth.basic(username, password)
-            }
+            const username = searchParams.get('user') || undefined
+            const password = searchParams.get('pass') || undefined
 
             // Attempt to Connect
             const config: Neo4jConfig = {
