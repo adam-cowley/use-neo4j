@@ -85,12 +85,12 @@ export const Neo4jProvider: React.FC<Neo4jProviderProps> = (props: Neo4jProvider
         if ( searchParams.has('url') ) {
             const url = searchParams.get('url')!
 
-            const matches = url.match(/((neo4j\+ssc|neo4j\+s|neo4j|bolt\+ssc|bolt\+s|bolt):\/\/)([a-z0-9\.]+)(:([0-9]+))/)
+            const matches = url.match(/^((neo4j|bolt)((\+s?(sc)?)?):\/\/)?([\w.]+)(:([0-9]+))?$/)
 
             if (matches) {
-                urlScheme = matches[2]
-                urlHost = matches[3]
-                urlPort = matches[5]
+                urlScheme = matches[2] || 'neo4j'
+                urlHost = matches[6]
+                urlPort = matches[8]  || 7687
             }
         }
 
