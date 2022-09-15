@@ -192,9 +192,9 @@ useWriteTransaction(database?: string): TransactionState
 Example:
 
 ```ts
-import { useReadTransaction } from 'use-neo4j'
+import { useWriteTransaction } from 'use-neo4j'
 
-const { transaction, commit, rollback } = useTransaction('mydb')
+const { commit, rollback } = useWriteTransaction('mydb')
 
 fetchSomeData()
     .then(properties => {
